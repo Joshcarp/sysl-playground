@@ -52,6 +52,7 @@ github.com/GeertJohan/go.incremental v1.0.0/go.mod h1:6fAjUhbVuX1KcMD3c8TEgVUqmo
 github.com/GeertJohan/go.rice v1.0.0/go.mod h1:eH6gbSOAUv07dQuZVnBmoDP8mgsM1rtixis4Tib9if0=
 github.com/GoogleCloudPlatform/cloudsql-proxy v0.0.0-20190418212003-6ac0b49e7197/go.mod h1:aJ4qN3TfrelA6NZ6AXsXRfmEVaYin3EDbSPJrKS8OXo=
 github.com/GoogleCloudPlatform/cloudsql-proxy v0.0.0-20190605020000-c4ba1fdf4d36/go.mod h1:aJ4qN3TfrelA6NZ6AXsXRfmEVaYin3EDbSPJrKS8OXo=
+github.com/Joshcarp/sysl-playground/attempt2 v0.0.0-20200107085212-c86430ca7798 h1:1a6oQbVpfn2l32Bip98HiwiyWH9JPmk4OHbb9NErO7Q=
 github.com/Joshcarp/sysl_testing v0.4.0 h1:C7qZ/fecIeVuA7KN9+GNzlrb1q/Bq6BruLsQn8TQ+vA=
 github.com/Joshcarp/sysl_testing v0.4.0/go.mod h1:pkkzzZcuU+8wXOgDCLjnXPE9Twr5hMNwtaR1BEYXhaw=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=

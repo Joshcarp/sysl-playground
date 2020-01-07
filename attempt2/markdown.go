@@ -2,14 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/Joshcarp/sysl-playground/attempt2/files"
 	"github.com/Joshcarp/sysl_testing/pkg/command"
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
 	"github.com/gopherjs/vecty/event"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/afero"
 )
 
 func main() {
@@ -78,14 +77,12 @@ func (m *Markdown) Render() vecty.ComponentOrHTML {
 	// Render the markdown input into HTML using Blackfriday.
 	// unsafeHTML := blackfriday.Run([]byte(m.Input))
 
-	var fs = afero.NewOsFs()
-	f, err := fs.OpenFile("tmp.sysl", os.O_RDWR, os.ModePerm)
+	var fs = files.Fs{}
+	f, err := fs.Create("tmp.sysl")
 	check(err)
 
 	_, e := f.Write([]byte(m.Input))
 	check(e)
-
-	f.Close()
 
 	var logger = logrus.New()
 	fmt.Println(logger)
@@ -98,7 +95,7 @@ func (m *Markdown) Render() vecty.ComponentOrHTML {
 	// g, err := fs.Create("project.svg")
 	// check(err)
 	// defer g.Close()
-	svg, err := afero.ReadFile(fs, "/project.textpb")
+	svg, err := fs.Open("project.textpb")
 	check(err)
 	fmt.Println(svg)
 
