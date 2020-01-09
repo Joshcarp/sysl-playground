@@ -2,15 +2,20 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	// "syscall/js"
 
+	"github.com/Joshcarp/sysl_testing/pkg/command"
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
 	"github.com/gopherjs/vecty/event"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
 var mychan = make(chan string, 10000)
 var mGlobal *Markdown
+var info *http.Response
 
 func main() {
 	vecty.SetTitle("sysl Demo")
@@ -25,11 +30,11 @@ MobileApp:
                 password <: string
         !type LoginResponse:
                 message <: string
-Server:
+Server2:
         Login(data <: MobileApp.LoginData):
                 return MobileApp.LoginResponse`,
 	})
-	keepAlive()
+	// go keepAlive()
 }
 
 // PageView is our main page component.
@@ -93,28 +98,40 @@ func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 	_, e := f.Write([]byte(m.Input))
 	check(e)
 
-	// function definition
-	// exposing to JS
-	// js.Global().Set("add", js.FuncOf(example))
-
-	// var logger = logrus.New()
-	// this := decimal.MustParse64(m.Input)
-	// command.Main2([]string{"sysl", "sd", "-o", "project.svg", "-s", "MobileApp <- Login", "tmp.sysl"}, fs, logger, command.Main3)
-	// http.Get("https://httpbin.org/get")
-
+	var logger = logrus.New()
+	command.Main2([]string{"sysl", "sd", "-o", "project.svg", "-s", "MobileApp <- Login", "tmp.sysl"}, fs, logger, command.Main3)
 
 	// svg, err := fs.Open("project.svg")
 	// check(err)
 	// fmt.Println(svg)
-	// this := make([]byte, 10000)
-	// svg.Read(this)
-	// keepAlive()
+	// this := make([]byte,0, 10000)
+	this, err := afero.ReadFile(fs, "project.svg")
+	check(err)
+
+	foo := fmt.Sprintf("<img src=\"%s\">", string(this))
+	fmt.Println(foo)
 	return elem.Div(
 		vecty.Markup(
-			vecty.UnsafeHTML("string(this)"),
+			vecty.UnsafeHTML(
+				foo),
 		),
 	)
 }
+
+// func keepAlive() {
+// 	example := func(this js.Value, i []js.Value) interface{} {
+// 		go func() {
+// 			info, _ = http.Get("https://httpbin.org/get")
+// 		}()
+// 		return nil
+// 	}
+// 	js.Global().Set("example", js.FuncOf(example))
+// 	select {}
+// }
+
+// 	js.Global().Set("example", js.FuncOf(example))
+// 	select {}
+// }
 
 // func runSysl(m *Markdown) (res vecty.ComponentOrHTML) {
 
@@ -125,17 +142,11 @@ func this() {
 
 func check(err error) {
 	if err != nil {
-		panic(err)
+		// panic(err)
 	}
 }
 
 var signal = make(chan int)
-
-func keepAlive() {
-	for {
-		<-signal
-	}
-}
 
 // // Render implements the vecty.Component interface.
 // func (m *Markdown) Render2() (res vecty.ComponentOrHTML) {
