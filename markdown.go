@@ -74,37 +74,20 @@ type Markdown struct {
 
 // Render implements the vecty.Component interface.
 func (m *Markdown) Render() vecty.ComponentOrHTML {
-	// Render the markdown input into HTML using Blackfriday.
-	// unsafeHTML := blackfriday.Run([]byte(m.Input))
-
 	fs := afero.NewMemMapFs()
 	f, err := fs.Create("/tmp.sysl")
-	// modulePath := filepath.Join("/", "tmp.sysl")
-
 	check(err)
 
 	_, e := f.Write([]byte(m.Input))
 	check(e)
-	// currentPath, err := filepath.Abs("tmp.sysl")
-	// // "tmp.sysl" the same /Users/carpeggj/Documents/work/sysl-playground/attempt2/tmp.sysl
-	// // "/tmp.sysl" the same as /
-	// fmt.Println(currentPath)
 
 	var logger = logrus.New()
-	// fmt.Println(logger)
-	// fmt.Println("this")
-	// rc := 0
-	// rc := command.Main2([]string{"sysl", "pb", "-o", "project.textpb", "tmp.sysl"}, fs, logger, command.Main3)
-	// os.Setenv("SYSL_PLANTUML", "http://plantuml.com/plantuml")
 
 	rc := command.Main2([]string{"sysl", "sd", "-o", "project.svg", "-s", "MobileApp <- Login", "tmp.sysl"}, fs, logger, command.Main3)
 
 	if rc != 0 {
 		panic(rc)
 	}
-	// g, err := fs.Create("project.svg")
-	// // check(err)
-	// // defer g.Close()
 	svg, err := fs.Open("project.svg")
 	check(err)
 	fmt.Println(svg)
