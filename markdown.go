@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+
 	// "syscall/js"
 
 	"github.com/Joshcarp/sysl_testing/pkg/command"
@@ -30,9 +32,10 @@ MobileApp:
                 password <: string
         !type LoginResponse:
                 message <: string
-Server2:
+Server:
         Login(data <: MobileApp.LoginData):
-                return MobileApp.LoginResponse`,
+				return MobileApp.LoginResponse`,
+		Command: "sysl sd -o \"project.svg\" -s \"MobileApp <- Login\" tmp.sysl",
 	})
 	// go keepAlive()
 }
@@ -40,7 +43,8 @@ Server2:
 // PageView is our main page component.
 type PageView struct {
 	vecty.Core
-	Input string
+	Input   string
+	Command string
 }
 
 // Render implements the vecty.Component interface.
@@ -48,9 +52,7 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 	return elem.Body(
 		// Display a textarea on the right-hand side of the page.
 		elem.Div(
-			vecty.Markup(
-				vecty.Style("float", "right"),
-			),
+
 			elem.TextArea(
 				vecty.Markup(
 					vecty.Style("font-family", "monospace"),
@@ -66,10 +68,28 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 				),
 				vecty.Text(p.Input), // initial textarea text.
 			),
+			elem.TextArea(
+				vecty.Markup(
+					vecty.Style("font-family", "monospace"),
+					vecty.Property("rows", 1),
+					vecty.Property("cols", 70),
+
+					// When input is typed into the textarea, update the local
+					// component state and rerender.
+					event.Input(func(e *vecty.Event) {
+						p.Command = e.Target.Get("value").String()
+						vecty.Rerender(p)
+					}),
+				),
+				vecty.Text(p.Command), // initial textarea text.
+			),
+			vecty.Markup(
+				vecty.Style("float", "right"),
+			),
 		),
 
 		// Render the markdown.
-		&Markdown{Input: p.Input},
+		&Markdown{Input: p.Input, Command: p.Command},
 	)
 }
 
@@ -77,7 +97,8 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 // HTML into a div.
 type Markdown struct {
 	vecty.Core
-	Input string `vecty:"prop"`
+	Input   string `vecty:"prop"`
+	Command string
 }
 
 // Render implements the vecty.Component interface.
@@ -99,7 +120,10 @@ func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 	check(e)
 
 	var logger = logrus.New()
-	command.Main2([]string{"sysl", "sd", "-o", "project.svg", "-s", "MobileApp <- Login", "tmp.sysl"}, fs, logger, command.Main3)
+	args, err := parseCommandLine(m.Command)
+	check(err)
+	fmt.Println(args, len(args))
+	command.Main2(args, fs, logger, command.Main3)
 
 	// svg, err := fs.Open("project.svg")
 	// check(err)
@@ -147,6 +171,71 @@ func check(err error) {
 }
 
 var signal = make(chan int)
+
+func parseCommandLine(command string) ([]string, error) {
+	var args []string
+	state := "start"
+	current := ""
+	quote := "\""
+	escapeNext := true
+	for i := 0; i < len(command); i++ {
+		c := command[i]
+
+		if state == "quotes" {
+			if string(c) != quote {
+				current += string(c)
+			} else {
+				args = append(args, current)
+				current = ""
+				state = "start"
+			}
+			continue
+		}
+
+		if escapeNext {
+			current += string(c)
+			escapeNext = false
+			continue
+		}
+
+		if c == '\\' {
+			escapeNext = true
+			continue
+		}
+
+		if c == '"' || c == '\'' {
+			state = "quotes"
+			quote = string(c)
+			continue
+		}
+
+		if state == "arg" {
+			if c == ' ' || c == '\t' {
+				args = append(args, current)
+				current = ""
+				state = "start"
+			} else {
+				current += string(c)
+			}
+			continue
+		}
+
+		if c != ' ' && c != '\t' {
+			state = "arg"
+			current += string(c)
+		}
+	}
+
+	if state == "quotes" {
+		return []string{}, errors.New(fmt.Sprintf("Unclosed quote in command line: %s", command))
+	}
+
+	if current != "" {
+		args = append(args, current)
+	}
+
+	return args, nil
+}
 
 // // Render implements the vecty.Component interface.
 // func (m *Markdown) Render2() (res vecty.ComponentOrHTML) {

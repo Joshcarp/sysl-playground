@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"syscall/js"
+	"strings"
+
+	// "syscall/js"
 
 	"github.com/Joshcarp/sysl_testing/pkg/command"
 	"github.com/gopherjs/vecty"
@@ -32,7 +34,8 @@ MobileApp:
                 message <: string
 Server:
         Login(data <: MobileApp.LoginData):
-                return MobileApp.LoginResponse`,
+				return MobileApp.LoginResponse`,
+		Command: "sysl sd -o \"project.svg\" -s \"MobileApp <- Login\" project.sysl",
 	})
 	// go keepAlive()
 }
@@ -40,7 +43,8 @@ Server:
 // PageView is our main page component.
 type PageView struct {
 	vecty.Core
-	Input string
+	Input   string
+	Command string
 }
 
 // Render implements the vecty.Component interface.
@@ -48,9 +52,7 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 	return elem.Body(
 		// Display a textarea on the right-hand side of the page.
 		elem.Div(
-			vecty.Markup(
-				vecty.Style("float", "right"),
-			),
+
 			elem.TextArea(
 				vecty.Markup(
 					vecty.Style("font-family", "monospace"),
@@ -66,10 +68,28 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 				),
 				vecty.Text(p.Input), // initial textarea text.
 			),
+			elem.TextArea(
+				vecty.Markup(
+					vecty.Style("font-family", "monospace"),
+					vecty.Property("rows", 1),
+					vecty.Property("cols", 70),
+
+					// When input is typed into the textarea, update the local
+					// component state and rerender.
+					event.Input(func(e *vecty.Event) {
+						p.Input = e.Target.Get("value").String()
+						vecty.Rerender(p)
+					}),
+				),
+				vecty.Text(p.Command), // initial textarea text.
+			),
+			vecty.Markup(
+				vecty.Style("float", "right"),
+			),
 		),
 
 		// Render the markdown.
-		&Markdown{Input: p.Input},
+		&Markdown{Input: p.Input, Command: p.Command},
 	)
 }
 
@@ -77,7 +97,8 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 // HTML into a div.
 type Markdown struct {
 	vecty.Core
-	Input string `vecty:"prop"`
+	Input   string `vecty:"prop"`
+	Command string
 }
 
 // Render implements the vecty.Component interface.
@@ -99,30 +120,36 @@ func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 	check(e)
 
 	var logger = logrus.New()
-	command.Main2([]string{"sysl", "sd", "-o", "project.svg", "-s", "MobileApp <- Login", "tmp.sysl"}, fs, logger, command.Main3)
+	args := strings.Split(m.Command, " ")
+	command.Main2([]string{args}, fs, logger, command.Main3)
 
-	svg, err := fs.Open("project.svg")
+	// svg, err := fs.Open("project.svg")
+	// check(err)
+	// fmt.Println(svg)
+	// this := make([]byte,0, 10000)
+	this, err := afero.ReadFile(fs, "project.svg")
 	check(err)
-	fmt.Println(svg)
-	this := make([]byte, 10000)
-	svg.Read(this)
+
+	foo := fmt.Sprintf("<img src=\"%s\">", string(this))
+	fmt.Println(foo)
 	return elem.Div(
 		vecty.Markup(
-			vecty.UnsafeHTML(strin(this)),
+			vecty.UnsafeHTML(
+				foo),
 		),
 	)
 }
 
-func keepAlive() {
-	example := func(this js.Value, i []js.Value) interface{} {
-		go func() {
-			info, _ = http.Get("https://httpbin.org/get")
-		}()
-		return nil
-	}
-	js.Global().Set("example", js.FuncOf(example))
-	select {}
-}
+// func keepAlive() {
+// 	example := func(this js.Value, i []js.Value) interface{} {
+// 		go func() {
+// 			info, _ = http.Get("https://httpbin.org/get")
+// 		}()
+// 		return nil
+// 	}
+// 	js.Global().Set("example", js.FuncOf(example))
+// 	select {}
+// }
 
 // 	js.Global().Set("example", js.FuncOf(example))
 // 	select {}
@@ -137,7 +164,7 @@ func this() {
 
 func check(err error) {
 	if err != nil {
-		panic(err)
+		// panic(err)
 	}
 }
 
