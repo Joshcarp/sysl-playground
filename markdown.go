@@ -98,7 +98,7 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 type Markdown struct {
 	vecty.Core
 	Input   string `vecty:"prop"`
-	Command string
+	Command string `vecty:"prop"`
 }
 
 // Render implements the vecty.Component interface.
@@ -125,10 +125,6 @@ func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 	fmt.Println(args, len(args))
 	command.Main2(args, fs, logger, command.Main3)
 
-	// svg, err := fs.Open("project.svg")
-	// check(err)
-	// fmt.Println(svg)
-	// this := make([]byte,0, 10000)
 	this, err := afero.ReadFile(fs, "project.svg")
 	check(err)
 
@@ -142,31 +138,9 @@ func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 	)
 }
 
-// func keepAlive() {
-// 	example := func(this js.Value, i []js.Value) interface{} {
-// 		go func() {
-// 			info, _ = http.Get("https://httpbin.org/get")
-// 		}()
-// 		return nil
-// 	}
-// 	js.Global().Set("example", js.FuncOf(example))
-// 	select {}
-// }
-
-// 	js.Global().Set("example", js.FuncOf(example))
-// 	select {}
-// }
-
-// func runSysl(m *Markdown) (res vecty.ComponentOrHTML) {
-
-// }
-func this() {
-	fmt.Println("yes")
-}
-
 func check(err error) {
 	if err != nil {
-		// panic(err)
+		panic(err)
 	}
 }
 
@@ -236,46 +210,3 @@ func parseCommandLine(command string) ([]string, error) {
 
 	return args, nil
 }
-
-// // Render implements the vecty.Component interface.
-// func (m *Markdown) Render2() (res vecty.ComponentOrHTML) {
-// 	defer func() {
-// 		if r := recover(); r != nil {
-
-// 			res = elem.Div(
-// 				vecty.Markup(
-// 					vecty.UnsafeHTML(fmt.Sprintf("%s", r)),
-// 				),
-// 			)
-// 		}
-// 	}()
-// 	fs := afero.NewMemMapFs()
-// 	f, err := fs.Create("/tmp.sysl")
-// 	check(err)
-
-// 	_, e := f.Write([]byte(m.Input))
-// 	check(e)
-
-// 	var logger = logrus.New()
-
-// 	// if rc != 0 {
-// 	// 	panic(rc)
-// 	// }
-// 	svg, err := fs.Open("/project.svg")
-// 	check(err)
-// 	fmt.Println(svg)
-// 	this := make([]byte, 10000)
-// 	svg.Read(this)
-
-// 	return elem.Div(
-// 		vecty.Markup(
-// 			vecty.UnsafeHTML(string(this)),
-// 		),
-// 	)
-// }
-
-// func check(err error) {
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
