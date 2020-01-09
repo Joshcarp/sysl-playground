@@ -94,14 +94,18 @@ func (m *Markdown) Render() vecty.ComponentOrHTML {
 	// fmt.Println(logger)
 	// fmt.Println("this")
 	// rc := 0
-	rc := command.Main2([]string{"sysl", "pb", "-o", "project.textpb", "tmp.sysl"}, fs, logger, command.Main3)
+	// rc := command.Main2([]string{"sysl", "pb", "-o", "project.textpb", "tmp.sysl"}, fs, logger, command.Main3)
+	// os.Setenv("SYSL_PLANTUML", "http://plantuml.com/plantuml")
+
+	rc := command.Main2([]string{"sysl", "sd", "-o", "project.svg", "-s", "MobileApp <- Login", "tmp.sysl"}, fs, logger, command.Main3)
+
 	if rc != 0 {
 		panic(rc)
 	}
 	// g, err := fs.Create("project.svg")
 	// // check(err)
 	// // defer g.Close()
-	svg, err := fs.Open("project.textpb")
+	svg, err := fs.Open("project.svg")
 	check(err)
 	fmt.Println(svg)
 	this := make([]byte, 10000)

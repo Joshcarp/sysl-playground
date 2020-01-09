@@ -24,6 +24,7 @@ func OutputPlantuml(output, plantuml, umlInput string, fs afero.Fs) error {
 			return err
 		}
 		plantuml = fmt.Sprintf("%s/%s/%s", plantuml, mode, encoded)
+		fmt.Println(plantuml)
 		out, err := sendHTTPRequest(plantuml)
 		if err != nil {
 			return err
