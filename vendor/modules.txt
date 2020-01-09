@@ -1,11 +1,12 @@
 # aqwari.net/xml v0.0.0-20190526204230-8dd125f7c15c
-aqwari.net/xml/xsd
 aqwari.net/xml/internal/dependency
 aqwari.net/xml/xmltree
+aqwari.net/xml/xsd
 # github.com/Joshcarp/sysl_testing v0.4.0
 github.com/Joshcarp/sysl_testing/pkg/command
 github.com/Joshcarp/sysl_testing/pkg/eval
 github.com/Joshcarp/sysl_testing/pkg/exporter
+github.com/Joshcarp/sysl_testing/pkg/grammar
 github.com/Joshcarp/sysl_testing/pkg/importer
 github.com/Joshcarp/sysl_testing/pkg/msg
 github.com/Joshcarp/sysl_testing/pkg/parse
@@ -14,7 +15,6 @@ github.com/Joshcarp/sysl_testing/pkg/pbutil
 github.com/Joshcarp/sysl_testing/pkg/sysl
 github.com/Joshcarp/sysl_testing/pkg/syslutil
 github.com/Joshcarp/sysl_testing/pkg/validate
-github.com/Joshcarp/sysl_testing/pkg/grammar
 # github.com/PuerkitoBio/purell v1.1.1
 github.com/PuerkitoBio/purell
 # github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
@@ -26,6 +26,8 @@ github.com/alecthomas/template/parse
 github.com/alecthomas/units
 # github.com/antlr/antlr4 v0.0.0-20191217191749-ff67971f8580
 github.com/antlr/antlr4/runtime/Go/antlr
+# github.com/anz-bank/decimal v0.0.0-20191115032101-ed1ea41a7bff
+github.com/anz-bank/decimal
 # github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 github.com/asaskevich/govalidator
 # github.com/cornelk/hashmap v1.0.1
@@ -35,8 +37,8 @@ github.com/davecgh/go-spew/spew
 # github.com/dchest/siphash v1.2.1
 github.com/dchest/siphash
 # github.com/getkin/kin-openapi v0.2.0
-github.com/getkin/kin-openapi/openapi3
 github.com/getkin/kin-openapi/jsoninfo
+github.com/getkin/kin-openapi/openapi3
 # github.com/ghodss/yaml v1.0.0
 github.com/ghodss/yaml
 # github.com/go-openapi/analysis v0.19.7
@@ -59,10 +61,10 @@ github.com/go-openapi/swag
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
 # github.com/golang/protobuf v1.3.2
+github.com/golang/protobuf/jsonpb
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go/descriptor
 github.com/golang/protobuf/ptypes/empty
-github.com/golang/protobuf/jsonpb
 github.com/golang/protobuf/ptypes/struct
 # github.com/gopherjs/vecty v0.0.0-20191201071242-14367e2384f2
 github.com/gopherjs/vecty
@@ -71,9 +73,9 @@ github.com/gopherjs/vecty/event
 # github.com/konsorten/go-windows-terminal-sequences v1.0.2
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/mailru/easyjson v0.7.0
+github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
-github.com/mailru/easyjson/buffer
 # github.com/microcosm-cc/bluemonday v1.0.2
 github.com/microcosm-cc/bluemonday
 # github.com/mitchellh/mapstructure v1.1.2
@@ -99,12 +101,12 @@ github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
 # go.mongodb.org/mongo-driver v1.2.0
 go.mongodb.org/mongo-driver/bson
+go.mongodb.org/mongo-driver/bson/bsoncodec
+go.mongodb.org/mongo-driver/bson/bsonoptions
+go.mongodb.org/mongo-driver/bson/bsonrw
 go.mongodb.org/mongo-driver/bson/bsontype
 go.mongodb.org/mongo-driver/bson/primitive
-go.mongodb.org/mongo-driver/bson/bsoncodec
-go.mongodb.org/mongo-driver/bson/bsonrw
 go.mongodb.org/mongo-driver/x/bsonx/bsoncore
-go.mongodb.org/mongo-driver/bson/bsonoptions
 # golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
 golang.org/x/net/html
 golang.org/x/net/html/atom
@@ -113,27 +115,27 @@ golang.org/x/net/idna
 # golang.org/x/sys v0.0.0-20200107162124-548cf772de50
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
-golang.org/x/text/transform
-golang.org/x/text/unicode/norm
-golang.org/x/text/width
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
-golang.org/x/text/secure/bidirule
-golang.org/x/text/unicode/bidi
-golang.org/x/text/encoding/internal/identifier
 golang.org/x/text/encoding/internal
+golang.org/x/text/encoding/internal/identifier
 golang.org/x/text/encoding/japanese
 golang.org/x/text/encoding/korean
 golang.org/x/text/encoding/simplifiedchinese
 golang.org/x/text/encoding/traditionalchinese
 golang.org/x/text/encoding/unicode
-golang.org/x/text/language
-golang.org/x/text/internal/utf8internal
-golang.org/x/text/runes
 golang.org/x/text/internal/language
 golang.org/x/text/internal/language/compact
 golang.org/x/text/internal/tag
+golang.org/x/text/internal/utf8internal
+golang.org/x/text/language
+golang.org/x/text/runes
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+golang.org/x/text/width
 # gopkg.in/alecthomas/kingpin.v2 v2.2.6
 gopkg.in/alecthomas/kingpin.v2
 # gopkg.in/yaml.v2 v2.2.7

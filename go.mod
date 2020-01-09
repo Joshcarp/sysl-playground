@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/Joshcarp/sysl_testing v0.4.0
 	github.com/antlr/antlr4 v0.0.0-20191217191749-ff67971f8580 // indirect
+	github.com/anz-bank/decimal v0.0.0-20191115032101-ed1ea41a7bff
 	github.com/go-openapi/analysis v0.19.7 // indirect
 	github.com/go-openapi/errors v0.19.3 // indirect
 	github.com/go-openapi/loads v0.19.4 // indirect
