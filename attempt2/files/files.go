@@ -1,6 +1,9 @@
 package files
 
-import "os"
+import (
+	"io"
+	"os"
+)
 
 type FileStruct struct {
 	info     fileInfo
@@ -29,21 +32,39 @@ func (f File) Close() error {
 }
 
 func (f File) Read(p []byte) (n int, err error) {
-	p = f.f.contents
-	return 0, nil
+
+	lenp := cap(p)
+	lenf := len(f.f.contents) - int(f.f.info.offset)
+	if lenf == 0 {
+		f.f.info.offset = 0
+		return 0, io.EOF
+	}
+	if lenp > lenf {
+		// p = f.f.contents
+		n = copy(p, f.f.contents[f.f.info.offset:lenf])
+		f.f.info.offset = int64(lenf)
+		return n, nil
+	}
+	f.f.info.offset = int64(lenp)
+	// p = f.f.contents[:lenp]
+	n = copy(p, f.f.contents[f.f.info.offset:lenp])
+	return n, nil
 }
 
 func (f File) ReadAt(p []byte, off int64) (n int, err error) {
-	panic("ReadAt not implemented") // TODO: Implement
+
+	// n, err := f.content.ReadAt(b, off)
+
+	panic("not implemented ")
 }
 
 func (f File) Seek(offset int64, whence int) (int64, error) {
 	panic("Seek not implemented") // TODO: Implement
 }
 
-func (f File) Write(p []byte) (n int, err error) {
-	f.f.contents = p
-	return 0, nil
+func (f File) Write(p []byte) (int, error) {
+	n := copy(f.f.contents, p)
+	return n, nil
 }
 
 func (f File) WriteAt(p []byte, off int64) (n int, err error) {

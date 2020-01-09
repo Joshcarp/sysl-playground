@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/Joshcarp/sysl-playground/attempt2/files"
 	"github.com/Joshcarp/sysl_testing/pkg/command"
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
 	"github.com/gopherjs/vecty/event"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 )
 
 func main() {
@@ -77,31 +77,38 @@ func (m *Markdown) Render() vecty.ComponentOrHTML {
 	// Render the markdown input into HTML using Blackfriday.
 	// unsafeHTML := blackfriday.Run([]byte(m.Input))
 
-	var fs = files.Fs{}
-	f, err := fs.Create("tmp.sysl")
+	fs := afero.NewMemMapFs()
+	f, err := fs.Create("/tmp.sysl")
+	// modulePath := filepath.Join("/", "tmp.sysl")
+
 	check(err)
 
 	_, e := f.Write([]byte(m.Input))
 	check(e)
+	// currentPath, err := filepath.Abs("tmp.sysl")
+	// // "tmp.sysl" the same /Users/carpeggj/Documents/work/sysl-playground/attempt2/tmp.sysl
+	// // "/tmp.sysl" the same as /
+	// fmt.Println(currentPath)
 
 	var logger = logrus.New()
-	fmt.Println(logger)
-	fmt.Println("this")
+	// fmt.Println(logger)
+	// fmt.Println("this")
 	// rc := 0
 	rc := command.Main2([]string{"sysl", "pb", "-o", "project.textpb", "tmp.sysl"}, fs, logger, command.Main3)
 	if rc != 0 {
-		// panic(rc)
+		panic(rc)
 	}
 	// g, err := fs.Create("project.svg")
-	// check(err)
-	// defer g.Close()
+	// // check(err)
+	// // defer g.Close()
 	svg, err := fs.Open("project.textpb")
 	check(err)
 	fmt.Println(svg)
-
+	this := make([]byte, 10000)
+	svg.Read(this)
 	return elem.Div(
 		vecty.Markup(
-			vecty.UnsafeHTML("this isn't some text"),
+			vecty.UnsafeHTML(string(this)),
 		),
 	)
 }

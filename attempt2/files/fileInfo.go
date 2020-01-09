@@ -8,6 +8,7 @@ import (
 type fileInfo struct {
 	name    string
 	size    int64
+	offset  int64
 	mode    os.FileMode
 	modTime time.Time
 	isDir   bool
