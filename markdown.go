@@ -52,7 +52,6 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 	return elem.Body(
 		// Display a textarea on the right-hand side of the page.
 		elem.Div(
-
 			elem.TextArea(
 				vecty.Markup(
 					vecty.Style("font-family", "monospace"),
@@ -84,7 +83,7 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 				vecty.Text(p.Command), // initial textarea text.
 			),
 			vecty.Markup(
-				vecty.Style("float", "right"),
+				vecty.Style("float", "left"),
 			),
 		),
 
