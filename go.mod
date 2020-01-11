@@ -14,6 +14,7 @@ require (
 	github.com/go-openapi/strfmt v0.19.4 // indirect
 	github.com/go-openapi/swag v0.19.6 // indirect
 	github.com/gopherjs/vecty v0.0.0-20191227222824-6a0a25ee5a96
+	github.com/jaschaephraim/lrserver v0.0.0-20171129202958-50d19f603f71
 	github.com/jonfriesen/go-billy-afero v0.0.0-20200102230923-9d09d50de89f // indirect
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
@@ -28,4 +29,5 @@ require (
 	golang.org/x/crypto v0.0.0-20191227163750-53104e6ec876 // indirect
 	golang.org/x/sys v0.0.0-20200107162124-548cf772de50 // indirect
 	golang.org/x/tools v0.0.0-20200103221440-774c71fcf114 // indirect
+	gopkg.in/fsnotify.v1 v1.4.7
 )

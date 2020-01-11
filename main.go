@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	// "syscall/js"
-
 	"github.com/Joshcarp/sysl_testing/pkg/command"
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
@@ -20,7 +18,7 @@ var mGlobal *Markdown
 var info *http.Response
 
 func main() {
-	vecty.SetTitle("sysl Demo")
+	vecty.SetTitle("sysl playground")
 
 	vecty.RenderBody(&PageView{
 		Input: `

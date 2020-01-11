@@ -14,14 +14,13 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
-	"regexp"
-	"time"
 
-	"github.com/radovskyb/watcher"
+	"github.com/jaschaephraim/lrserver"
+	"gopkg.in/fsnotify.v1"
 )
 
 func server() {
-	port := flag.String("p", "2020", "port to serve on")
+	port := flag.String("p", "2021", "port to serve on")
 	directory := flag.String("d", ".", "the directory of static file to host")
 	flag.Parse()
 
@@ -31,66 +30,49 @@ func server() {
 	log.Fatal(http.ListenAndServe(":"+*port, nil))
 }
 
+const html = `<!doctype html>
+<html>
+<head>
+<script src="http://localhost:35729/livereload.js"></script>
+</head>
+</html>`
+
 func main() {
-	w := watcher.New()
-	go server()
-	// SetMaxEvents to 1 to allow at most 1 event's to be received
-	// on the Event channel per watching cycle.
-	//
-	// If SetMaxEvents is not set, the default is to send all events.
-	w.SetMaxEvents(1)
+	// Create file watcher
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer watcher.Close()
 
-	// Only notify rename and move events.
-	w.FilterOps(watcher.Rename, watcher.Move, watcher.Write)
+	// Add dir to watcher
+	err = watcher.Add(".")
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	// Only files that match the regular expression during file listings
-	// will be watched.
-	r := regexp.MustCompile(".*")
-	w.AddFilterHook(watcher.RegexFilterHook(r, false))
+	// Create and start LiveReload server
+	lr := lrserver.New(lrserver.DefaultName, lrserver.DefaultPort)
+	go lr.ListenAndServe()
 
+	// Start goroutine that requests reload upon watcher event
 	go func() {
 		for {
 			select {
-			case event := <-w.Event:
-				fmt.Println(event) // Print the event's info.
+			case event := <-watcher.Events:
+				fmt.Println(event)
 				cmd := exec.Command("make")
 				cmd.Run()
-			case err := <-w.Error:
-				log.Fatalln(err)
-			case <-w.Closed:
-				return
+				lr.Reload("index.html")
+			case err := <-watcher.Errors:
+				log.Println(err)
 			}
 		}
 	}()
+	// server()
+	http.HandleFunc("/", func(rw http.ResponseWriter, req *http.Request) {
+		rw.Write([]byte(html))
+	})
+	http.ListenAndServe(":3000", nil)
 
-	// Watch this folder for changes.
-	if err := w.Add("."); err != nil {
-		log.Fatalln(err)
-	}
-
-	// // Watch test_folder recursively for changes.
-	// if err := w.AddRecursive("../"); err != nil {
-	// 	log.Fatalln(err)
-	// }
-
-	// Print a list of all of the files and folders currently
-	// being watched and their paths.
-	for path, f := range w.WatchedFiles() {
-		fmt.Printf("%s: %s\n", path, f.Name())
-	}
-
-	fmt.Println()
-
-	// Trigger 2 events after watcher started.
-	// go func() {
-	// 	w.Wait()
-	// 	fmt.Println("touched")
-	// 	w.TriggerEvent(watcher.Create, nil)
-	// 	w.TriggerEvent(watcher.Remove, nil)
-	// }()
-
-	// Start the watching process - it'll check for changes every 100ms.
-	if err := w.Start(time.Millisecond * 100); err != nil {
-		log.Fatalln(err)
-	}
 }
