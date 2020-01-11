@@ -4,10 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-
+	"regexp"
+	"syscall/js"
+	"encoding/json"
 	"github.com/Joshcarp/sysl_testing/pkg/command"
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
+	b64 "encoding/base64"
 	"github.com/gopherjs/vecty/event"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -17,23 +20,60 @@ var mychan = make(chan string, 10000)
 var mGlobal *Markdown
 var info *http.Response
 
+func loadQueryParams() (map[string]interface{}, bool) {
+	href := js.Global().Get("location").Get("href")
+	str := fmt.Sprintf("%s", href)
+	re := regexp.MustCompile(`(?m)\?(.*)`)
+
+	coded := re.FindString(str)
+	if len(coded) == 0{
+		return nil, false
+	}
+	ans := coded[1:]
+	ans = decode(ans)
+	var dat map[string]interface{}
+
+	if err := json.Unmarshal([]byte(ans), &dat); err != nil {
+        panic(err)
+    }
+
+	return dat, true
+}
+
+func decode(str string)string{
+	return b64.StdEncoding.EncodeToString([]byte(str))   
+}
+
+func encode(str string)string{
+	this, _ := b64.StdEncoding.DecodeString(str)
+	return string(this)
+}
+
 func main() {
+	href, ok := loadQueryParams()
+	input, command := `MobileApp:
+	Login:
+			Server <- Login
+	!type LoginData:
+			username <: string
+			password <: string
+	!type LoginResponse:
+			message <: string
+Server:
+	Login(data <: MobileApp.LoginData):
+			return MobileApp.LoginResponse`, "sysl sd -o \"project.svg\" -s \"MobileApp <- Login\" tmp.sysl"
+	if ok{
+
+input = href["Input"].(string)
+command = href["Command"].(string)
+
+	}
+
 	vecty.SetTitle("sysl playground")
 
 	vecty.RenderBody(&PageView{
-		Input: `
-MobileApp:
-        Login:
-                Server <- Login
-        !type LoginData:
-                username <: string
-                password <: string
-        !type LoginResponse:
-                message <: string
-Server:
-        Login(data <: MobileApp.LoginData):
-				return MobileApp.LoginResponse`,
-		Command: "sysl sd -o \"project.svg\" -s \"MobileApp <- Login\" tmp.sysl",
+		Input:   input,
+		Command: command,
 	})
 	// go keepAlive()
 }
