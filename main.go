@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
+	"net/url"
+	// "regexp"
 	"syscall/js"
-	"encoding/json"
+	// "encoding/json"
 	"github.com/Joshcarp/sysl_testing/pkg/command"
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
@@ -20,38 +21,36 @@ var mychan = make(chan string, 10000)
 var mGlobal *Markdown
 var info *http.Response
 
-func loadQueryParams() (map[string]interface{}, bool) {
+func loadQueryParams() (url.Values, bool) {
 	href := js.Global().Get("location").Get("href")
 	str := fmt.Sprintf("%s", href)
-	re := regexp.MustCompile(`(?m)\?(.*)`)
-
-	coded := re.FindString(str)
-	if len(coded) == 0{
-		return nil, false
+	u, err := url.Parse(str)
+	check(err)
+	if len(u.Query()) ==0{
+		return u.Query(), false
 	}
-	ans := coded[1:]
-	ans = decode(ans)
-	var dat map[string]interface{}
-
-	if err := json.Unmarshal([]byte(ans), &dat); err != nil {
-        panic(err)
-    }
-
-	return dat, true
-}
-
-func decode(str string)string{
-	return b64.StdEncoding.EncodeToString([]byte(str))   
+	return u.Query(), true
 }
 
 func encode(str string)string{
+	return b64.StdEncoding.EncodeToString([]byte(str))   
+}
+
+func decode(str string)string{
 	this, _ := b64.StdEncoding.DecodeString(str)
 	return string(this)
 }
-
-func main() {
-	href, ok := loadQueryParams()
-	input, command := `MobileApp:
+func decodeQueryParams(in url.Values)(string, string){
+	foo := decode(in.Get("input"))
+	bar :=  decode(in.Get("cmd"))
+	return foo,bar
+}
+func setup()(string, string){
+	href, _ := loadQueryParams()
+	input, cmd := decodeQueryParams(href)
+	fmt.Println("command", cmd)
+	if cmd == ""{
+	input = `MobileApp:
 	Login:
 			Server <- Login
 	!type LoginData:
@@ -61,20 +60,24 @@ func main() {
 			message <: string
 Server:
 	Login(data <: MobileApp.LoginData):
-			return MobileApp.LoginResponse`, "sysl sd -o \"project.svg\" -s \"MobileApp <- Login\" tmp.sysl"
-	if ok{
-
-input = href["Input"].(string)
-command = href["Command"].(string)
-
+			return MobileApp.LoginResponse`
+	cmd = "sysl sd -o \"project.svg\" -s \"MobileApp <- Login\" tmp.sysl"
 	}
+	fmt.Println(cmd, input)
+	fmt.Println("2")
+	return input, cmd
+}
+func main() {
+	input, cmd := setup()
 
 	vecty.SetTitle("sysl playground")
-
+	
 	vecty.RenderBody(&PageView{
 		Input:   input,
-		Command: command,
+		Command: cmd,
 	})
+	fmt.Println("5")
+
 	// go keepAlive()
 }
 
