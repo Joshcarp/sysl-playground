@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"time"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -19,6 +20,14 @@ import (
 var mychan = make(chan string, 10000)
 var mGlobal *Markdown
 var info *http.Response
+func encodeUrl(input, cmd string)string{
+	input = encode(input)
+	cmd = encode(cmd)
+	url := js.Global().Get("location").Get("hostname") 
+	port := js.Global().Get("location").Get("port")
+	return fmt.Sprintf("http://%s:%s/?input=%s&cmd=%s", url, port, input, cmd)
+
+}
 
 func loadQueryParams() (url.Values, bool) {
 	href := js.Global().Get("location").Get("href")
@@ -71,6 +80,8 @@ Server:
 	return input, cmd
 }
 func main() {
+	c := make(chan bool)
+
 	input, cmd := setup()
 
 	vecty.SetTitle("sysl playground")
@@ -82,6 +93,8 @@ func main() {
 	fmt.Println("5")
 
 	// go keepAlive()
+	<-c
+	select{}
 }
 
 // PageView is our main page component.
@@ -89,6 +102,7 @@ type PageView struct {
 	vecty.Core
 	Input   string
 	Command string
+	Link string
 }
 
 // Render implements the vecty.Component interface.
@@ -129,12 +143,35 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 			vecty.Markup(
 				vecty.Style("float", "left"),
 			),
+			elem.Anchor(
+				vecty.Text(p.Link),
+			),
+			elem.Button(
+				vecty.Markup(
+					// vecty.Property("disabled", a.err != "" || a.isCompiling),
+					vecty.UnsafeHTML("Run"),
+					event.Click(func(e *vecty.Event) {
+						p.Link = encodeUrl(p.Input, p.Command)
+						vecty.Rerender(p)
+					}),
+			),
+			),
 		),
+
 
 		// Render the markdown.
 		&Markdown{Input: p.Input, Command: p.Command},
 	)
 }
+func (p *PageView)Run(e *vecty.Event){
+	p.Command = "this"
+	go p.RunAsync()
+	
+}
+func (p *PageView)RunAsync(){
+	vecty.Rerender(p)
+}
+
 
 // Markdown is a simple component which renders the Input markdown as sanitized
 // HTML into a div.
@@ -143,7 +180,9 @@ type Markdown struct {
 	Input   string `vecty:"prop"`
 	Command string `vecty:"prop"`
 }
-
+func Schedule(f func()) {
+	time.AfterFunc(0, f)
+}
 // Render implements the vecty.Component interface.
 func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 	defer func() {

@@ -248,10 +248,14 @@ github.com/googleapis/gax-go v2.0.2+incompatible/go.mod h1:SFVmujtThgffbyetf+mdk
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
+github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
+github.com/gopherjs/vecty v0.0.0-20190121070609-2a1e317a95ae/go.mod h1:cCfq26X9MMEw/ZgZRpDDNSWfC7CO/u2ba/nGpjEVM/o=
 github.com/gopherjs/vecty v0.0.0-20191201071242-14367e2384f2 h1:D2Ab9TmBPxaXZt7qdyVOhu9uZ9CJP/YjSZ7EF3QzhMU=
 github.com/gopherjs/vecty v0.0.0-20191201071242-14367e2384f2/go.mod h1:Yd9AOfl6lN1BWnVnvaSBwKiTCAcnlIGGvdsODOOZ9RY=
 github.com/gopherjs/vecty v0.0.0-20191227222824-6a0a25ee5a96 h1:1Hlu3sp8c5cT5zGLoxHjHw07x0WsxA1t2nDulhO/EK8=
 github.com/gopherjs/vecty v0.0.0-20191227222824-6a0a25ee5a96/go.mod h1:Yd9AOfl6lN1BWnVnvaSBwKiTCAcnlIGGvdsODOOZ9RY=
+github.com/gopherjs/vecty/example v0.0.0-20191227222824-6a0a25ee5a96 h1:ogDmIW8eS7CFZM6fMYZrDzOYHgyaC5+hp+1IRqLUEfo=
+github.com/gopherjs/vecty/example v0.0.0-20191227222824-6a0a25ee5a96/go.mod h1:Q+pviq0v9oAECJMu9Ti/nfy2UlaZ90hTlbo2EzOH/I4=
 github.com/gorilla/context v1.1.1/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
 github.com/gorilla/csrf v1.6.0/go.mod h1:7tSf8kmjNYr7IWDCYhd3U8Ck34iQ/Yw5CJu7bAkHEGI=
 github.com/gorilla/handlers v1.4.1/go.mod h1:Qkdc/uu4tH4g6mTK6auzZ766c4CA0Ng8+o/OAirnOIQ=
@@ -481,6 +485,8 @@ go.uber.org/multierr v1.1.0/go.mod h1:wR5kodmAFQ0UK8QlbwjlSNy0Z68gJhDJUG5sjR94q/
 go.uber.org/zap v1.10.0/go.mod h1:vwi/ZaCAaUcBkycHslxD9B2zi4UTXhF60s6SWpuDF0Q=
 gocloud.dev v0.15.0/go.mod h1:ShXCyJaGrJu9y/7a6+DSCyBb9MFGZ1P5wwPa0Wu6w34=
 gocloud.dev v0.18.0/go.mod h1:lhLOb91+9tKB8RnNlsx+weJGEd0AHM94huK1bmrhPwM=
+golang.org/dl v0.0.0-20200113210548-1b9ab2716afa h1:THjmSh4nVlA08HdbHWQMiaQrk/FgZAS9uA124+8g/1E=
+golang.org/dl v0.0.0-20200113210548-1b9ab2716afa/go.mod h1:IUMfjQLJQd4UTqG1Z90tenwKoCX93Gn3MAQJMOSBsDQ=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20181001203147-e3636079e1a4/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
