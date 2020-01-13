@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	// "regexp"
+	"regexp"
 	"syscall/js"
-	// "encoding/json"
 	"github.com/Joshcarp/sysl_testing/pkg/command"
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
@@ -49,8 +48,9 @@ func setup()(string, string){
 	href, _ := loadQueryParams()
 	input, cmd := decodeQueryParams(href)
 	fmt.Println("command", cmd)
-	if cmd == ""{
-	input = `MobileApp:
+
+	if input == ""{
+		input = `MobileApp:
 	Login:
 			Server <- Login
 	!type LoginData:
@@ -61,8 +61,11 @@ func setup()(string, string){
 Server:
 	Login(data <: MobileApp.LoginData):
 			return MobileApp.LoginResponse`
-	cmd = "sysl sd -o \"project.svg\" -s \"MobileApp <- Login\" tmp.sysl"
+	} 
+	if cmd == ""{
+		cmd = "sysl sd -o \"project.svg\" -s \"MobileApp <- Login\" tmp.sysl"
 	}
+
 	fmt.Println(cmd, input)
 	fmt.Println("2")
 	return input, cmd
@@ -153,6 +156,16 @@ func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 		}
 	}()
 	fs := afero.NewMemMapFs()
+	re := regexp.MustCompile(`\w*\.sysl`)
+
+	fmt.Println("m.Command", m.Command)
+	m.Command = re.ReplaceAllString(m.Command, "/tmp.sysl")
+
+	fmt.Println("m.Command", m.Command)
+
+	re = regexp.MustCompile(`(?m)(?:-o)\s"?([\S]+)`)
+	// fmt.Println("this this ", m.Command)
+	m.Command = re.ReplaceAllString(m.Command, "-o project.svg")
 	f, err := fs.Create("/tmp.sysl")
 	check(err)
 
@@ -164,7 +177,7 @@ func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 	check(err)
 	fmt.Println(args, len(args))
 	command.Main2(args, fs, logger, command.Main3)
-
+	
 	this, err := afero.ReadFile(fs, "project.svg")
 	check(err)
 
