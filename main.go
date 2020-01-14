@@ -157,7 +157,7 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
 			elem.Button(
 				vecty.Markup(
 					// vecty.Property("disabled", a.err != "" || a.isCompiling),
-					vecty.UnsafeHTML("Run"),
+					vecty.UnsafeHTML("Share"),
 					event.Click(func(e *vecty.Event) {
 						p.Link = encodeUrl(p.Input, p.Command)
 						vecty.Rerender(p)
