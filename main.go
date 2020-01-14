@@ -23,9 +23,17 @@ var info *http.Response
 func encodeUrl(input, cmd string)string{
 	input = encode(input)
 	cmd = encode(cmd)
-	url := js.Global().Get("location").Get("hostname") 
-	port := js.Global().Get("location").Get("port")
-	return fmt.Sprintf("http://%s:%s/?input=%s&cmd=%s", url, port, input, cmd)
+	url := js.Global().Get("location").Get("hostname").String()
+	port := js.Global().Get("location").Get("port").String()
+	pathname := js.Global().Get("location").Get("pathname").String()
+
+	if port !=""{
+		port += ":"
+	}
+	if pathname != ""{
+		pathname = "/"+pathname
+	}
+	return fmt.Sprintf("http://%s%s%s?input=%s&cmd=%s", url, port, pathname, input, cmd)
 
 }
 
