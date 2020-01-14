@@ -1,3 +1,16 @@
 {
-    "sysl.workspace.root": "/Users/carpeggj/Documents/work/sysl-playground"
+    "sysl.workspace.root": "/Users/carpeggj/Documents/work/sysl-playground",
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    }, 
+    "go.toolsEnvVars": {
+        "GOOS": "js",
+        "GOARCH": "wasm",
+        "GOROOT": "/usr/local/go",
+        "GOPATH": "/home/corey/src/goprojects"
+      }
+    
 }
