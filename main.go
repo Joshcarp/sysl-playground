@@ -72,6 +72,7 @@ func (p *PageView) Render() vecty.ComponentOrHTML {
                         vecty.Markup(
                                 vecty.Style("font-family", "monospace"),
                         ),
+                       
                 ),
 
                 // Display a textarea on the right-hand side of the page.
