@@ -1,16 +1,17 @@
 package main
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
 	"syscall/js"
+
 	"github.com/Joshcarp/sysl_testing/pkg/command"
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
-	b64 "encoding/base64"
 	"github.com/gopherjs/vecty/event"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -20,36 +21,61 @@ var mychan = make(chan string, 10000)
 var mGlobal *Markdown
 var info *http.Response
 
+func encodeUrl(input, cmd string) string {
+	input = encode(input)
+	cmd = encode(cmd)
+	url := js.Global().Get("location").Get("hostname").String()
+	port := js.Global().Get("location").Get("port").String()
+	pathname := js.Global().Get("location").Get("pathname").String()
+
+	if port != "" {
+		port = ":" + port
+	}
+	// pathname  = strings.Replace(pathname, `/`,"", 1)
+	// if pathname != ""{
+	// 	pathname = `/` + pathname
+	// }
+
+	fmt.Println(pathname)
+	return fmt.Sprintf("http://%s%s/%s?input=%s&cmd=%s", url, port, pathname, input, cmd)
+
+}
+
 func loadQueryParams() (url.Values, bool) {
 	href := js.Global().Get("location").Get("href")
 	str := fmt.Sprintf("%s", href)
 	u, err := url.Parse(str)
 	check(err)
-	if len(u.Query()) ==0{
+	if len(u.Query()) == 0 {
 		return u.Query(), false
 	}
 	return u.Query(), true
 }
 
-func encode(str string)string{
-	return b64.StdEncoding.EncodeToString([]byte(str))   
+func encode(str string) string {
+	return base64.StdEncoding.EncodeToString([]byte(str))
 }
 
-func decode(str string)string{
-	this, _ := b64.StdEncoding.DecodeString(str)
+func decode(str string) string {
+	this, _ := base64.StdEncoding.DecodeString(str)
 	return string(this)
 }
-func decodeQueryParams(in url.Values)(string, string){
+func decodeQueryParams(in url.Values) (string, string) {
 	foo := decode(in.Get("input"))
-	bar :=  decode(in.Get("cmd"))
-	return foo,bar
+	bar := decode(in.Get("cmd"))
+	return foo, bar
 }
-func setup()(string, string){
+func decodeURLString(in string) (string, string) {
+	u, err := url.Parse(in)
+	check(err)
+	return decodeQueryParams(u.Query())
+}
+func setup() (string, string) {
 	href, _ := loadQueryParams()
 	input, cmd := decodeQueryParams(href)
 	fmt.Println("command", cmd)
 
-	if input == ""{
+	if input == "" {
 		input = `MobileApp:
 	Login:
 			Server <- Login
@@ -61,8 +87,8 @@ func setup()(string, string){
 Server:
 	Login(data <: MobileApp.LoginData):
 			return MobileApp.LoginResponse`
-	} 
-	if cmd == ""{
+	}
+	if cmd == "" {
 		cmd = "sysl sd -o \"project.svg\" -s \"MobileApp <- Login\" tmp.sysl"
 	}
 
@@ -71,10 +97,12 @@ Server:
 	return input, cmd
 }
 func main() {
+	c := make(chan bool)
+
 	input, cmd := setup()
 
 	vecty.SetTitle("sysl playground")
-	
+
 	vecty.RenderBody(&PageView{
 		Input:   input,
 		Command: cmd,
@@ -82,57 +110,101 @@ func main() {
 	fmt.Println("5")
 
 	// go keepAlive()
+	<-c
+	select {}
 }
 
 // PageView is our main page component.
 type PageView struct {
 	vecty.Core
-	Input   string
-	Command string
+	Input     string
+	Command   string
+	Link      string
+	InputLink string
 }
 
 // Render implements the vecty.Component interface.
 func (p *PageView) Render() vecty.ComponentOrHTML {
 	return elem.Body(
 		// Display a textarea on the right-hand side of the page.
-		elem.Div(
-			elem.TextArea(
-				vecty.Markup(
-					vecty.Style("font-family", "monospace"),
-					vecty.Property("rows", 14),
-					vecty.Property("cols", 70),
+		elem.Table(
+			elem.TableRow(
+				elem.TableData(
+					elem.TextArea(
+						vecty.Markup(
+							vecty.Style("font-family", "monospace"),
+							vecty.Property("rows", 14),
+							vecty.Property("cols", 70),
 
-					// When input is typed into the textarea, update the local
-					// component state and rerender.
-					event.Input(func(e *vecty.Event) {
-						p.Input = e.Target.Get("value").String()
+							// When input is typed into the textarea, update the local
+							// component state and rerender.
+							event.Input(func(e *vecty.Event) {
+								p.Input = e.Target.Get("value").String()
+								vecty.Rerender(p)
+							}),
+						),
+						vecty.Text(p.Input), // initial textarea text.
+					),
+				),
+				elem.TableData(
+					&Markdown{Input: p.Input, Command: p.Command},
+				),
+			),
+			elem.TableRow(
+				elem.TableData(
+					elem.TextArea(
+						vecty.Markup(
+							vecty.Style("font-family", "monospace"),
+							vecty.Property("rows", 1),
+							vecty.Property("cols", 70),
+
+							// When input is typed into the textarea, update the local
+							// component state and rerender.
+							event.Input(func(e *vecty.Event) {
+								p.Command = e.Target.Get("value").String()
+								vecty.Rerender(p)
+							}),
+						),
+						vecty.Text(p.Command), // initial textarea text.
+					),
+				),
+			)),
+		elem.TableRow(
+			elem.Button(
+				vecty.Markup(
+					vecty.UnsafeHTML("Share"),
+					event.Click(func(e *vecty.Event) {
+						p.Link = encodeUrl(p.Input, p.Command)
 						vecty.Rerender(p)
 					}),
 				),
-				vecty.Text(p.Input), // initial textarea text.
 			),
-			elem.TextArea(
-				vecty.Markup(
-					vecty.Style("font-family", "monospace"),
-					vecty.Property("rows", 1),
-					vecty.Property("cols", 70),
-
-					// When input is typed into the textarea, update the local
-					// component state and rerender.
-					event.Input(func(e *vecty.Event) {
-						p.Command = e.Target.Get("value").String()
-						vecty.Rerender(p)
-					}),
+			// elem.Button(
+			// 	vecty.Markup(
+			// 		vecty.UnsafeHTML("Load"),
+			// 		event.Click(func(e *vecty.Event) {
+			// 			p.Input, p.Command = decodeURLString(p.InputLink)
+			// 			vecty.Rerender(p)
+			// 		}),
+			// 	),
+			// ),
+		),
+		elem.TableRow(
+			elem.TableData(
+				elem.TextArea(
+					vecty.Markup(
+						vecty.Style("font-family", "monospace"),
+						vecty.Property("rows", 2),
+						vecty.Property("cols", 70),
+						vecty.Style("wrap", "hard"),
+						event.Input(func(e *vecty.Event) {
+							p.InputLink = e.Target.Get("value").String()
+						}),
+					),
+					vecty.Text(p.Link),
 				),
-				vecty.Text(p.Command), // initial textarea text.
-			),
-			vecty.Markup(
-				vecty.Style("float", "left"),
 			),
 		),
-
-		// Render the markdown.
-		&Markdown{Input: p.Input, Command: p.Command},
 	)
 }
 
@@ -158,10 +230,7 @@ func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 	fs := afero.NewMemMapFs()
 	re := regexp.MustCompile(`\w*\.sysl`)
 
-	fmt.Println("m.Command", m.Command)
 	m.Command = re.ReplaceAllString(m.Command, "/tmp.sysl")
-
-	fmt.Println("m.Command", m.Command)
 
 	re = regexp.MustCompile(`(?m)(?:-o)\s"?([\S]+)`)
 	// fmt.Println("this this ", m.Command)
@@ -177,7 +246,7 @@ func (m *Markdown) Render() (res vecty.ComponentOrHTML) {
 	check(err)
 	fmt.Println(args, len(args))
 	command.Main2(args, fs, logger, command.Main3)
-	
+
 	this, err := afero.ReadFile(fs, "project.svg")
 	check(err)
 
