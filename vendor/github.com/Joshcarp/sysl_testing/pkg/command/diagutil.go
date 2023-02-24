@@ -24,13 +24,10 @@ func OutputPlantuml(output, plantuml, umlInput string, fs afero.Fs) error {
 			return err
 		}
 		plantuml = fmt.Sprintf("%s/%s/%s", plantuml, mode, encoded)
-		out := []byte(plantuml)
-		// out, err := sendHTTPRequest(plantuml)
-		// err := nil
-
-		// if err != nil {
-		// 	return err
-		// }
+		out, err := sendHTTPRequest(plantuml)
+		if err != nil {
+			return err
+		}
 		return errors.Wrapf(afero.WriteFile(fs, output, out, os.ModePerm), "writing %q", output)
 
 	case "uml":

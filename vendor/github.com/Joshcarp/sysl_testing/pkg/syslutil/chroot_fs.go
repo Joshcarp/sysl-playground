@@ -21,18 +21,14 @@ var _ afero.Fs = &ChrootFs{}
 func NewChrootFs(fs afero.Fs, root string) *ChrootFs {
 	if !filepath.IsAbs(root) {
 		var err error
-		root, err = AbsFilepath(fs, root)
+		root, err = filepath.Abs(root)
 		if err != nil {
 			panic(err)
 		}
 	}
 	return &ChrootFs{fs: fs, root: root}
 }
-func AbsFilepath(fs afero.Fs, path string) (string, error) {
-	this := afero.NewBasePathFs(fs, "/").(*afero.BasePathFs)
-	return (this.RealPath(path))
 
-}
 func (fs *ChrootFs) join(name string) (string, error) {
 	// this is to avoid windows joining volume name twice in a nested fs
 	volumeName := filepath.VolumeName(name)
