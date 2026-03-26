@@ -10,7 +10,7 @@ import (
 
 const (
 	PlantUMLEnvVar  = "SYSL_PLANTUML"
-	PlantUMLDefault = "http://plantuml.com/plantuml"
+	PlantUMLDefault = "http://localhost:8080/plantuml"
 )
 
 type plantumlmixin struct {
