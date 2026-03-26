@@ -110,18 +110,9 @@ func (pc *projectConfiguration) configureProject(root, module string, fs afero.F
 	pc.fs = syslutil.NewChrootFs(fs, pc.root)
 	return nil
 }
-func AbsFilepath(fs afero.Fs, path string) (string, error) {
-	this := afero.NewBasePathFs(fs, "/").(*afero.BasePathFs)
-	return (this.RealPath(path))
 
-}
 func findRootFromSyslModule(modulePath string, fs afero.Fs) (string, error) {
-	fmt.Println("hello", modulePath)
-	currentPath, err := AbsFilepath(fs, modulePath)
-	// fmt.Println(a)
-	// this := afero.NewBasePathFs(fs, "/").(*afero.BasePathFs)
-	// currentPath, err := this.RealPath(modulePath)
-	// fmt.Println("world", currentPath, err)
+	currentPath, err := filepath.Abs(modulePath)
 	if err != nil {
 		return "", err
 	}
